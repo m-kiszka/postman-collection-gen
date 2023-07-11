@@ -12,33 +12,15 @@ import { readFileSync } from 'fs';
 
 import * as commander from 'commander';
 
-const languageVariantPairs = [
-  'C#,RestSharp',
-  'Dart,http',
-  'cURL,cURL',
-  'Go,Native',
-  'HTTP,HTTP',
-  'Java,OkHttp',
-  'Java,Unirest',
-  'JavaScript,Fetch',
-  'JavaScript,jQuery',
-  'JavaScript,XHR',
-  'NodeJs,Native',
-  'NodeJs,Request',
-  'NodeJs,Unirest',
-  'Objective-C,NSURLSession',
-  'OCaml,Cohttp',
-  'PHP,cURL',
-  'PHP,pecl_http',
-  'PHP,HTTP_Request2',
-  'PowerShell,RestMethod',
-  'Python,http.client',
-  'Python,Requests',
-  'Ruby,Net:HTTP',
-  'Shell,Httpie',
-  'Shell,wget',
-  'Swift,URLSession'
-].map(v => v.toLowerCase());
+var languageVariantPairs: string[] = [];
+let languages = codegen.getLanguageList();
+languages.forEach(function(i) {
+  let key = i.label;
+  i.variants.forEach(function(v) {
+    languageVariantPairs.push(key+","+v.key);
+  })
+});
+languageVariantPairs = languageVariantPairs.map(v => v.toLowerCase());
 
 function parseTuple(
   value: string,

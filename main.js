@@ -4,33 +4,17 @@ var postman_collection_1 = require("postman-collection");
 var codegen = require('postman-code-generators');
 var fs_1 = require("fs");
 var commander = require("commander");
-var languageVariantPairs = [
-    'C#,RestSharp',
-    'Dart,http',
-    'cURL,cURL',
-    'Go,Native',
-    'HTTP,HTTP',
-    'Java,OkHttp',
-    'Java,Unirest',
-    'JavaScript,Fetch',
-    'JavaScript,jQuery',
-    'JavaScript,XHR',
-    'NodeJs,Native',
-    'NodeJs,Request',
-    'NodeJs,Unirest',
-    'Objective-C,NSURLSession',
-    'OCaml,Cohttp',
-    'PHP,cURL',
-    'PHP,pecl_http',
-    'PHP,HTTP_Request2',
-    'PowerShell,RestMethod',
-    'Python,http.client',
-    'Python,Requests',
-    'Ruby,Net:HTTP',
-    'Shell,Httpie',
-    'Shell,wget',
-    'Swift,URLSession'
-].map(function (v) { return v.toLowerCase(); });
+
+var languageVariantPairs = [];
+let languages = codegen.getLanguageList();
+languages.forEach(element => {
+    let key = element.key;
+    element.variants.forEach(value => {
+        languageVariantPairs.push(key+","+value.key);
+    })
+});
+languageVariantPairs = languageVariantPairs.map(function (v) { return v.toLowerCase(); });
+
 function parseTuple(value, dummy) {
     var v = value.trim().toLowerCase();
     if (!languageVariantPairs.includes(v)) {
