@@ -2,7 +2,14 @@
 exports.__esModule = true;
 var postman_collection_1 = require("postman-collection");
 var codegen = require('postman-code-generators');
-var fs_1 = require("fs");
+var fs = require("fs");
+
+var dir = './samples';
+if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+}
+
+var util = require('util');
 var commander = require("commander");
 
 var languageVariantPairs = [];
@@ -14,6 +21,13 @@ languages.forEach(element => {
     })
 });
 languageVariantPairs = languageVariantPairs.map(function (v) { return v.toLowerCase(); });
+
+function saveToFile(name, text) {
+    let path = __dirname + '\\samples\\' + name +".txt";
+    let file = fs.createWriteStream(path, {flags : 'a+'});
+    file.write(text + '\n----------------------------------------------------------------\n\n');
+    file.end();
+}
 
 function parseTuple(value, dummy) {
     var v = value.trim().toLowerCase();
@@ -39,7 +53,7 @@ function debugPrint(message) {
 }
 debugPrint(program.opts());
 var collectionPath = program['collection'];
-var collection = new postman_collection_1.Collection(JSON.parse((0, fs_1.readFileSync)(collectionPath).toString()));
+var collection = new postman_collection_1.Collection(JSON.parse((0, fs.readFileSync)(collectionPath).toString()));
 debugPrint(collection);
 var options = {
     trimRequestBody: true,
@@ -53,6 +67,7 @@ function isItemGroup(itemG) {
 }
 function printSnippet(item) {
     if (isItem(item)) {
+        let filename = lvp.language+"_"+lvp.variant;
         codegen.convert(lvp.language, lvp.variant, item.request, options, function (error, snippet) {
             if (error) {
                 console.error('Error trying to generate code for request:', item.request, error);
@@ -63,7 +78,9 @@ function printSnippet(item) {
             if (matches && matches.length > 0) {
                 matches.forEach(function (m) { return console.warn(m + " : Variable not provided"); });
             }
-            console.log(completeSnippet);
+            if(filename && completeSnippet) {
+                saveToFile(filename, completeSnippet);   
+            }
         });
     }
     else if (isItemGroup(item)) {
@@ -72,7 +89,7 @@ function printSnippet(item) {
 }
 var environmentVariables = new postman_collection_1.VariableList(new postman_collection_1.Property({ name: 'environmentVariables' }), []);
 if (program['envvars']) {
-    var environment = JSON.parse((0, fs_1.readFileSync)(program['envvars']).toString());
+    var environment = JSON.parse((0, fs.readFileSync)(program['envvars']).toString());
     debugPrint(environment);
     environment['values'].forEach(function (v) {
         environmentVariables.append(new postman_collection_1.Variable(v));
